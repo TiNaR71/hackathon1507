@@ -33,12 +33,12 @@
                         <div class="element select">
                             Фильтр
                         </div>
-                        <div class="element">Жилой комплекс</div>
+                        <div class="element"  style="cursor: not-allowed">Жилой комплекс</div>
                     </div>
                     <div class="right-box">
                         <div class="buttons">
-                            <div class="button">Создать подборку</div>
-                            <div class="button active">Создать объект</div>
+                            <div class="button"  style="cursor: not-allowed">Создать подборку</div>
+                            <div class="button active"  style="cursor: not-allowed">Создать объект</div>
                         </div>
                     </div>
                 </div>
@@ -48,8 +48,8 @@
             <div class="scroll-sidebar">
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
-                        <li :class="'sidebar-item' + ($route.path == menu.link ? ' active':'')" v-for="menu in menus" :key="menu.link" @mouseover="menu.select = true" @mouseleave="menu.select = false">
-                            <router-link  :to="menu.link" class="sidebar-link waves-effect waves-dark sidebar-link">
+                        <li :class="'sidebar-item' + ($route.path == menu.link ? ' active':'')" v-for="(menu, index) in menus" :key="'menu_'+index" @mouseover="menu.select = true" @mouseleave="menu.select = false">
+                            <router-link  :to="menu.link?menu.link:'/'" class="sidebar-link waves-effect waves-dark sidebar-link"  :style="!menu.link? {cursor: 'not-allowed'}:''">
                                 <i class="me-3 mdi fs-3" :style="{backgroundImage: menu.select || $route.path == menu.link?('url(/my/'+menu.icon+'-active.svg)'):('url(/my/'+menu.icon+'.svg)'), width: '20px', height: '20px'}"></i>
                                 <span class="hide-menu">{{ menu.label }}</span>
                             </router-link>

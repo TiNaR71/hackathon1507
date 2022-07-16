@@ -127,6 +127,9 @@ class HelloController extends Controller
                                     if(!empty($v)) $object->$k = json_encode(array_keys($v));
                                 }
                                 elseif($k == 'id') $object->external_id = $v;
+                                elseif($k == 'square' || $k == 'living' || $k == 'kitchen') {
+                                    $object->$k=$v[0];
+                                }
                                 elseif(is_array($v)) $object->$k = json_encode($v);
                                 else $object->$k = $v;
                             } else echo $object->hasAttribute($k).' - '.$k . json_encode($v).PHP_EOL;
@@ -145,5 +148,14 @@ class HelloController extends Controller
                     }
                 }
             }
+    }
+    public function actionFixSquare() {
+        foreach (Objects::find()->andWhere(['OR', ['LIKE', 'square', '['], ['LIKE', 'living', '['], ['LIKE', 'kitchen', '['], ['LIKE', 'floor', '[']])->all() as $object) {
+            if(!empty($object->square) && strpos($object->square,'[') !== false) $object->square = json_decode($object->square, true)[0];
+            if(!empty($object->living) && strpos($object->living,'[') !== false) $object->living = json_decode($object->living, true)[0];
+            if(!empty($object->floor) && strpos($object->floor,'[') !== false) $object->floor = json_decode($object->floor, true)[0];
+            if(!empty($object->kitchen) && strpos($object->kitchen,'[') !== false) $object->kitchen = json_decode($object->kitchen, true)[0];
+            $object->save();
+        }
     }
 }

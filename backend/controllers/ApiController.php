@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Compilations;
 use app\models\Objects;
 use Yii;
 use yii\filters\AccessControl;
@@ -22,7 +23,7 @@ class ApiController extends Controller
         $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
             'cors' => [
-                'Origin' => ['*'],
+                //'Origin' => ['*'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
                 'Access-Control-Allow-Credentials' => false,
                 'Access-Control-Request-Headers' => ['*']
@@ -98,6 +99,26 @@ class ApiController extends Controller
         }
         return $this->asJson($filter);
     }
+    public function actionGetObject($id) {
+        return $this->asJson(Objects::findOne($id));
+    }
+    public function actionGetObjects() {
+        $cache = Yii::$app->cache;
+        $cache_key = implode('_', ['cache', 'search', md5(json_encode($_GET))]);
+        Yii::debug($cache_key);
+        $array = $cache->get($cache_key);
+        if(empty($array)) {
+            $objects = [];
+            $query = Objects::find();
+            $query->andWhere(['IN', 'id', $_GET['id']]);
+            foreach ($query->orderBy('id')->all() as $object) {
+                $objects[$object->id] = $object->getAttributes();
+            }
+            $array = ['found' => count($objects), 'elements' => array_values($objects)];
+            $cache->set($cache_key, $array, 10 * 60);
+        }
+        return $this->asJson($array);
+    }
     public function actionSearch() {
 
         $cache = Yii::$app->cache;
@@ -146,5 +167,41 @@ class ApiController extends Controller
             $cache->set($cache_key, $array, 10 * 60);
         }
         return $this->asJson($array);
+    }
+
+    public function actionSendCompl() {
+        $request = json_decode(Yii::$app->request->getRawBody());
+        $new = Compilations::findOne(['uuid'=>$request->uuid, 'name'=>$request->name]);
+        if(empty($new)) $new = new Compilations();
+        $new->uuid = $request->uuid;
+        $new->name = $request->name;
+        $new->object_ids = json_encode($request->ids);
+        $new->save();
+        return $this->asJson($new->getErrors());
+    }
+    public function actionGetCompl($uuid) {
+        $objects = [];
+        $query = Compilations::find();
+        $query->andWhere(['IN', 'uuid', $uuid]);
+        foreach ($query->orderBy('id')->all() as $object) {
+            $objects[$object->id] = [
+                'id'=>$object->id,
+                'name'=>$object->name,
+                'ids'=>json_decode($object->object_ids),
+                'created_at'=>$object->created_at
+            ];
+        }
+        $array = ['found' => count($objects), 'elements' => array_values($objects)];
+        return $this->asJson($array);
+    }
+    public function actionGetComp($id) {
+        $object = Compilations::findOne($id);
+        $objects = [
+            'id'=>$object->id,
+            'name'=>$object->name,
+            'ids'=>json_decode($object->object_ids),
+            'created_at'=>$object->created_at
+        ];
+        return $this->asJson($objects);
     }
 }

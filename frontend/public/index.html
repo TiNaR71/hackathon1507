@@ -21,36 +21,54 @@
         <header class="topbar" data-navbarbg="skin6">
             <nav class="navbar top-navbar navbar-expand-md navbar-dark">
                 <div class="navbar-header" data-logobg="skin6">
-                    <a class="navbar-brand" href="index.html">
+                    <router-link class="navbar-brand" to="/">
                         <span class="logo-text">
                 <img src="../my/logo.svg" alt="homepage" class="dark-logo"/>
               </span>
-                    </a>
+                    </router-link>
                     <a class="nav-toggler waves-effect waves-light text-dark d-block d-md-none" href="javascript:void(0)"><i class="ti-menu ti-close"></i></a>
                 </div>
-                <div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5">
-                    <div class="select-box">
-                        <div class="element select">
-                            Фильтр
+                <div class="navbar-collapse collapse" id="navbarSupportedContent"  data-navbarbg="skin5">
+                    <slot v-if="$route.name == 'Heart' || ($route.name == 'home' && Object.keys($route.params).length == 0)">
+                        <div class="select-box" v-if="$route.name == 'home'">
+                            <router-link tag="div" to="/" :class="'element' + ($route.name == 'home' && $route.path == '/' ? ' select': '')">
+                                Фильтр
+                            </router-link>
+                            <router-link tag="div" to="/board" :class="'element' + ($route.name == 'home' && $route.path == '/board' ? ' select': '')">Жилой комплекс</router-link>
                         </div>
-                        <div class="element"  style="cursor: not-allowed">Жилой комплекс</div>
-                    </div>
-                    <div class="right-box">
-                        <div class="buttons">
-                            <div class="button"  style="cursor: not-allowed">Создать подборку</div>
-                            <div class="button active"  style="cursor: not-allowed">Создать объект</div>
+                        <div class="right-box">
+                            <div class="buttons">
+                                <div class="button" v-if="Object.keys(compl).length" @click="createCompilation">Создать подборку</div>
+                                <div class="button active"  style="cursor: not-allowed">Создать объект</div>
+                            </div>
                         </div>
-                    </div>
+                    </slot>
+                    <slot v-if="$route.name == 'home' && Object.keys($route.params).length > 0">
+                        <h1> заголовок </h1>
+                        <div class="right-box">
+                            <div class="buttons">
+                                <div class="button"  style="cursor: not-allowed">Создать подборку</div>
+                                <div class="button active"  style="cursor: not-allowed">Создать объект</div>
+                            </div>
+                        </div>
+                    </slot>
+                    <slot v-if="$route.name == 'GraduationCap' && Object.keys($route.params).length === 0">
+                        <img class="pt-2" src="https://building.letsbot.ru/student_header.png" style="height: 100px; width: auto;margin-left: -15px;">
+                    </slot>
+                    <slot v-if="$route.name == 'GraduationCap' && Object.keys($route.params).length > 0">
+                        <router-link tag="img" to="/train" class="pt-2" src="https://building.letsbot.ru/student_header2.png" style="height: 100px; width: auto;margin-left: -15px;"></router-link>
+                    </slot>
                 </div>
+
             </nav>
         </header>
         <aside class="left-sidebar" data-sidebarbg="skin6">
             <div class="scroll-sidebar">
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
-                        <li :class="'sidebar-item' + ($route.path == menu.link ? ' active':'')" v-for="(menu, index) in menus" :key="'menu_'+index" @mouseover="menu.select = true" @mouseleave="menu.select = false">
+                        <li :class="'sidebar-item' + ($route.name == menu.icon ? ' active':'')" v-for="(menu, index) in menus" :key="'menu_'+index" @mouseover="menu.select = true" @mouseleave="menu.select = false">
                             <router-link  :to="menu.link?menu.link:'/'" class="sidebar-link waves-effect waves-dark sidebar-link"  :style="!menu.link? {cursor: 'not-allowed'}:''">
-                                <i class="me-3 mdi fs-3" :style="{backgroundImage: menu.select || $route.path == menu.link?('url(/my/'+menu.icon+'-active.svg)'):('url(/my/'+menu.icon+'.svg)'), width: '20px', height: '20px'}"></i>
+                                <i class="me-3 mdi fs-3" :style="{backgroundImage: menu.select || $route.name == menu.icon?('url(/my/'+menu.icon+'-active.svg)'):('url(/my/'+menu.icon+'.svg)'), width: '20px', height: '20px'}"></i>
                                 <span class="hide-menu">{{ menu.label }}</span>
                             </router-link>
                         </li>
@@ -62,10 +80,49 @@
         <div class="page-wrapper">
             <router-view></router-view>
         </div>
+        <div class="modal" tabindex="-1" id="createCompl">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Создание подборки</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Вы создаете подборку объектов, состоящую из {{compl.length}} объектов <br>
+                            При желании вы можете указать название для подборки, что бы ее было проще найти</p>
+                        <div class="col-md-12">
+                            <input type="text" v-model="compName" class="text-input" placeholder="Название, не обязательно">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" @click="sendCompilation">Создать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" tabindex="-1" id="responseModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Успех!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" @click="clearResponse" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{this.response}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="clearResponse" data-bs-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+
     <!-- built files will be auto injected -->
-    <script src="./assets/plugins/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/plugins/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap tether Core JavaScript -->
-    <script src="./assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

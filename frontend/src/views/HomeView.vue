@@ -93,16 +93,16 @@
     </div></div>
     <div id="objects" v-if="foundObjects.length">
       <span class="header">Найдено {{ found }} объектов</span>
-      <div class="list row">
-      <div class="object card col-4 mt-4" v-for="object in foundObjects" :key="object.id">
+      <div class="col-12 list row">
+      <div class="object card col-4 mt-4" v-for="object in foundObjects" :key="object.id" >
         <div class="row">
-          <div class="col-4 d-flex">
+          <input class="form-check-input" type="checkbox" v-model="checkbox[object.id]" @click="selectCheck(object.id)">
+          <div @click="openObject(object)" class="col-4 d-flex pointer">
             <img :src="'https://ask-yug.com' + object.picture" alt="">
           </div>
-          <div class="col-8">
+          <div @click="openObject(object)" class="col-8 pointer">
             <div class="id">ID {{object.external_id}}</div>
             <div class="tag">Свободно</div>
-            <input class="form-check-input" type="checkbox" value="">
             <label>Объект {{ object.object }}</label>
             <div class="parameters">
               Общая площадь <b>{{ object.square }} м²</b>
@@ -119,7 +119,7 @@
           <div class="col-12 pt-4">
             <div class="buttons">
               <div class="button bron" style="cursor: not-allowed">Забронировать</div>
-              <div class="button like" style="cursor: not-allowed"><i><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div class="button like" @click="setRecent(object.id)"><i><svg width="20" height="20" viewBox="0 0 20 20" :fill="recentList.indexOf(object.id) !== -1?'red':'none'" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10 16.875C10 16.875 2.1875 12.5 2.1875 7.18751C2.18766 6.24855 2.51301 5.33863 3.10824 4.61244C3.70347 3.88626 4.53183 3.38863 5.45249 3.20418C6.37315 3.01972 7.32928 3.15982 8.15832 3.60066C8.98736 4.04149 9.63814 4.75585 10 5.62227L9.99999 5.62228C10.3619 4.75585 11.0126 4.04149 11.8417 3.60066C12.6707 3.15983 13.6268 3.01973 14.5475 3.20418C15.4682 3.38863 16.2965 3.88625 16.8918 4.61244C17.487 5.33863 17.8123 6.24855 17.8125 7.18751C17.8125 12.5 10 16.875 10 16.875Z" stroke="#666565" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg></i>
               </div>
@@ -168,13 +168,17 @@ export default {
       data: {},
       found: 0,
       filterClear: 0,
-      foundObjects: []
+      foundObjects: [],
+      checkbox: {}
     }
   },
   computed: {
     objects () {
       return this.$store.getters.getObjects
-    }
+    },
+    recentList () {
+      return this.$store.getters.getRecent
+    },
   },
   methods: {
     clearFilter () {
@@ -218,7 +222,23 @@ export default {
         $state.loaded()
         if(response.data.elements.length < 20) $state.complete()
       })
+    },
+    selectCheck (id) {
+      if(this.checkbox[id] === undefined) this.checkbox[id] = true
+      else this.checkbox[id] = !this.checkbox[id]
+      var checkbox = Object.keys(this.checkbox).filter((n) => {var val = this.checkbox[n]; return val !== false});
+      this.$store.dispatch('SET_COMPL', checkbox)
+      this.$forceUpdate()
+    },
+    openObject (object) {
+      this.$store.dispatch('SET_OBJECT', object)
+      this.$router.push('/object/'+object.id)
+    },
+    setRecent (id) {
+      this.$store.dispatch('SET_RECENT', id)
     }
+  },
+  watch: {
   },
   mounted() {
       axios.get('https://building-api.letsbot.ru/api/get-filter').then(response => {
@@ -288,6 +308,9 @@ export default {
    flex-grow: 0;
    border: none;
  }
+.pointer {
+  cursor: pointer;
+}
 #objects {
   display: flex;
   flex-direction: column;
@@ -322,6 +345,8 @@ export default {
       top: 12px;
       width: 17px;
       height: 17px;
+      padding: 0;
+      margin: 0;
     }
     img {
       max-width: 144px;

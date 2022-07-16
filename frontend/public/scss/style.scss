@@ -1,0 +1,241 @@
+/*
+Template Name: Admin Template
+Author: Niravjoshi / Wrappixel
+File: scss
+*/
+
+//(Required file)
+@import "variable";
+
+// Import Bootstrap source files (Required file)
+@import "bootstrap/bootstrap";
+
+//This is for the components (Required file)
+@import "components";
+
+//This is for the widgets (Required file)
+@import "widgets/widgets";
+
+//This is for the responsive (Required file)
+@import "responsive";
+
+//In This scss you can write your scss
+@import "custom";
+
+//This is for the icons (Required file)
+@import "../css/icons/material-design-iconic-font/css/materialdesignicons.min.css";
+
+@import "landingpage";
+
+
+.logo-text {
+  margin: auto;
+}
+.navbar-brand {
+   margin-top: 28px !important;
+ }
+.left-sidebar {
+  position: fixed;
+  margin-top: 28px;
+}
+.topbar {
+  width: 100%;
+  background: #fff;
+  position: fixed;
+}
+.page-wrapper {
+  margin-top: 68px;
+}
+#navbarSupportedContent {
+  margin-top: -48px;
+}
+#sidebarnav li:hover, #sidebarnav li.active {
+  background: #284F9A;
+  .hide-menu {
+    color: white;
+  }
+}
+.scroll-sidebar {
+  padding-top: 70px;
+}
+header {
+  .select-box {
+    margin-left: 24px;
+  }
+}
+.select-box {
+  user-select: none;
+  /* Auto layout */
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px;
+
+  width: auto;
+  height: 44px;
+
+  /* Фон */
+
+  background: #F4F4F4;
+  border-radius: 100px;
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  .element {
+
+    /* Auto layout */
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 8px 20px;
+    gap: 10px;
+
+    width: auto;
+    height: 36px;
+
+    border-radius: 100px;
+
+    &.select {
+      background: #FFFEFE;
+      box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+.right-box {
+  user-select: none;
+  position: absolute;
+  right: 48px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px;
+  gap: 32px;
+
+  width: 611px;
+  height: 44px;
+
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+
+}
+.buttons {
+  /* Frame 454 */
+
+
+  /* Auto layout */
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 20px;
+
+  width: 350px;
+  height: 44px;
+
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+
+  .button {
+    /* Кнопка */
+
+
+    box-sizing: border-box;
+
+    /* Auto layout */
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 24px;
+    gap: 10px;
+
+    width: auto;
+    height: 44px;
+
+    border: 1.5px solid #666565;
+    border-radius: 100px;
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+    font-family: 'Calibri';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+
+
+    color: #666565;
+
+    &.active {
+      background: #284F9A;
+      border-radius: 100px;
+      color: #FFFEFE;
+    }
+  }
+}
+.card {
+  border-radius: 5px;
+}
+.show-more {
+  float: right;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 12px;
+
+  width: 172px;
+  height: 44px;
+
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+  i {
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    background-image: url("../my/Icon.svg");
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+
+  }
+  span {
+    height: 19px;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 19px;
+
+    color: #284F9A;
+
+
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+  }
+}

@@ -54,6 +54,9 @@ export default {
   computed: {
     uuid () {
       return this.$store.getters.getUid
+    },
+    role () {
+      return this.$store.getters.getRole
     }
   },
   methods: {
@@ -66,7 +69,7 @@ export default {
     },
     loadObjects () {
       this.load = true
-        axios.get('https://building-api.letsbot.ru/api/get-leads?uuid='+this.uuid).then(response => {
+        axios.get('https://building-api.letsbot.ru/api/get-leads?uuid='+this.uuid+'&role='+this.role).then(response => {
           this.found = response.data.found
           this.foundObjects = response.data.elements
           this.load = false

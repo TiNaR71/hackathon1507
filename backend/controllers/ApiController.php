@@ -242,14 +242,14 @@ class ApiController extends Controller
         $visit->tags=json_encode(['проявил интерес', 'оставил заявку', 'хакатон']);
         $visit->save();
     }
-    public function actionGetLeads($uuid) {
+    public function actionGetLeads($uuid,$role='') {
         $leads = [];
         $query = Deals::find();
-        $query->andWhere(['IN', 'uuid', $uuid]);
+//        if($role !== 'founder' && $role !== 'admin')$query->andWhere(['IN', 'uuid', $uuid]);
         $objects=ArrayHelper::map(Objects::find()->all(), 'id', function($data){
             return $data->getAttributes();
         });
-        foreach ($query->orderBy('id')->all() as $object) {
+        foreach ($query->orderBy(['id'=>SORT_DESC])->all() as $object) {
             $leads[$object->id] = $object->getAttributes();
             $leads[$object->id]['tags']=json_decode($object['tags'], true);
             $leads[$object->id]['object']=$objects[$object->object_id];

@@ -18,7 +18,7 @@
         </div>
     </div>
     <div  id="main-wrapper" data-layout="vertical"data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
-        <header class="topbar" data-navbarbg="skin6">
+        <header class="topbar" v-if="$route.name !== 'visit' && $route.name !== 'auth'" data-navbarbg="skin6">
             <nav class="navbar top-navbar navbar-expand-md navbar-dark">
                 <div class="navbar-header" data-logobg="skin6">
                     <router-link class="navbar-brand" to="/">
@@ -39,16 +39,15 @@
                         <div class="right-box">
                             <div class="buttons">
                                 <div class="button" v-if="Object.keys(compl).length" @click="createCompilation">Создать подборку</div>
-                                <div class="button active"  style="cursor: not-allowed">Создать объект</div>
+                                <div class="button active" v-if="Object.keys(compl).length" @click="shareObjects">Поделиться</div>
                             </div>
                         </div>
                     </slot>
                     <slot v-if="$route.name == 'home' && Object.keys($route.params).length > 0">
-                        <h1> заголовок </h1>
+                        <h4> {{ object.humanized_name }} </h4>
                         <div class="right-box">
                             <div class="buttons">
-                                <div class="button"  style="cursor: not-allowed">Создать подборку</div>
-                                <div class="button active"  style="cursor: not-allowed">Создать объект</div>
+                                <div class="button active"  @click="shareObjects">Поделиться</div>
                             </div>
                         </div>
                     </slot>
@@ -58,26 +57,83 @@
                     <slot v-if="$route.name == 'GraduationCap' && Object.keys($route.params).length > 0">
                         <router-link tag="img" to="/train" class="pt-2" src="https://building.letsbot.ru/student_header2.png" style="height: 100px; width: auto;margin-left: -15px;"></router-link>
                     </slot>
+                    <slot v-if="$route.name == 'deals'">
+                        <div class="select-box">
+                            <div class="element select">
+                                Все
+                            </div>
+                            <div class="element">
+                                Проявил интерес
+                            </div>
+                            <div class="element">
+                                Отправлено КП
+                            </div>
+                            <div class="element">
+                                Открыто КП
+                            </div>
+                            <div class="element">
+                                Изучено КП
+                            </div>
+                            <div class="element">
+                                Возражения отработаны
+                            </div>
+                            <div class="element">
+                                Передано застройщику
+                            </div>
+                            <div class="element">
+                                Демо проведено
+                            </div>
+                            <div class="element">
+                                Бронь
+                            </div>
+                            <div class="element">
+                                Договор
+                            </div>
+                            <div class="element">
+                                Оплата получена
+                            </div>
+                        </div>
+                    </slot>
                 </div>
 
             </nav>
+            <div @click="openLeft= !openLeft" id="burger">
+                <slot v-if="!openLeft"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 20 20" fill="none">
+                <path d="M3.125 10H16.875" stroke="#284F9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3.125 5H16.875" stroke="#284F9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3.125 15H16.875" stroke="#284F9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg></slot>
+                <slot v-else>
+                    <svg width="25" height="25" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.625 4.375L4.375 15.625" stroke="#284F9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15.625 15.625L4.375 4.375" stroke="#284F9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+
+                </slot>
+            </div>
         </header>
-        <aside class="left-sidebar" data-sidebarbg="skin6">
+        <aside :class="openLeft?'active left-sidebar':'left-sidebar'"  v-if="$route.name !== 'visit' && $route.name !== 'auth'" data-sidebarbg="skin6">
             <div class="scroll-sidebar">
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
-                        <li :class="'sidebar-item' + ($route.name == menu.icon ? ' active':'')" v-for="(menu, index) in menus" :key="'menu_'+index" @mouseover="menu.select = true" @mouseleave="menu.select = false">
+                        <li @click="openLeft = false" :class="'sidebar-item' + ($route.name == menu.icon ? ' active':'')" v-for="(menu, index) in menus" :key="'menu_'+index" @mouseover="menu.select = true" @mouseleave="menu.select = false">
                             <router-link  :to="menu.link?menu.link:'/'" class="sidebar-link waves-effect waves-dark sidebar-link"  :style="!menu.link? {cursor: 'not-allowed'}:''">
                                 <i class="me-3 mdi fs-3" :style="{backgroundImage: menu.select || $route.name == menu.icon?('url(/my/'+menu.icon+'-active.svg)'):('url(/my/'+menu.icon+'.svg)'), width: '20px', height: '20px'}"></i>
                                 <span class="hide-menu">{{ menu.label }}</span>
                             </router-link>
+                        </li>
+                        <li @click="openLeft = false, setRole('unknown')" class="sidebar-item" >
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link">
+                                <i class="me-3 mdi fs-3"></i>
+                                <span class="hide-menu">Выйти</span>
+                            </a>
                         </li>
                     </ul>
                 </nav>
             </div>
         </aside>
 
-        <div class="page-wrapper">
+        <div :class="$route.name !== 'visit' && $route.name !== 'auth' ? 'page-wrapper':'visit'">
             <router-view></router-view>
         </div>
         <div class="modal" tabindex="-1" id="createCompl">
@@ -93,6 +149,27 @@
                         <div class="col-md-12">
                             <input type="text" v-model="compName" class="text-input" placeholder="Название, не обязательно">
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" @click="sendCompilation">Создать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" tabindex="-1" id="shareModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Поделиться</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Вот ваша ссылка</h4>
+                        <input id="url" type="text" @click="copyUrl" readonly v-model="shareData.url" class="text-input col-12" >
+                        <button class="col-12 btn btn-success" @click="copyUrl">Скопировать</button>
+                        <canvas id="canvas"></canvas>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -124,5 +201,18 @@
     <script src="../assets/plugins/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap tether Core JavaScript -->
     <script src="../assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link
+            href="../assets/plugins/chartist/dist/chartist.min.css"
+            rel="stylesheet"
+    />
+    <script src="../assets/plugins/flot/jquery.flot.js"></script>
+    <script src="https://www.flotcharts.org/flot/source/jquery.flot.js"></script>
+    <script src="https://www.flotcharts.org/flot/source/jquery.flot.saturated.js"></script>
+    <script src="https://www.flotcharts.org/flot/source/jquery.flot.browser.js"></script>
+    <script src="https://www.flotcharts.org/flot/source/jquery.flot.drawSeries.js"></script>
+    <script src="https://www.flotcharts.org/flot/source/jquery.flot.uiConstants.js"></script>
+    <script src="https://www.flotcharts.org/flot/source/jquery.flot.time.js"></script>
+    <script src="../assets/plugins/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
   </body>
 </html>

@@ -2,6 +2,7 @@
   <div class="container-fluid" id="object">
     <div class="row">
       <div class="col-12">
+        <h4>{{ object.humanized_name }}</h4>
         <div class="card">
           <div class="card-body">
             <div class="row pb-5">
@@ -26,7 +27,8 @@
         </div>
       </div>
     </div>
-    <img class="pt-2" src="https://building.letsbot.ru/Frame%203482.png" alt="">
+    <iframe :src="'https://ipoteka.domclick.ru/calc-reg/calculator.html?cost='+object.full_price+'&prod=4&dk=true&dep=0'" frameborder="0" style="width: 100vw;height: 100vh;max-width: 1152px"></iframe>
+    <img class="pt-2 demo" src="https://building.letsbot.ru/Frame%203482.png" alt="">
   </div>
 </template>
 
@@ -35,7 +37,7 @@
 import axios from "axios";
 
 export default {
-  name: 'BookmarkView',
+  name: 'ObjectView',
   components: {},
   data () {
     return {
@@ -118,7 +120,7 @@ export default {
     height: auto;
   }
   .header {
-    font-family: 'Calibri';
+    //font-family: 'Calibri';
     font-style: normal;
     font-weight: 700;
     font-size: 20px;
@@ -144,7 +146,7 @@ export default {
         border-radius: 0px;
       }
 
-      font-family: 'Calibri';
+      //font-family: 'Calibri';
       font-style: normal;
       font-size: 16px;
       line-height: 20px;

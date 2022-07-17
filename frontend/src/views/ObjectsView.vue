@@ -1,9 +1,8 @@
 <template>
   <div class="container-fluid">
-    <div id="bookmarks_objects" v-if="foundObjects.length">
-      <span class="header">Подборка: {{object.name}} ({{object.ids.length}})</span>
+    <div id="bookmarks_objects" v-if="foundObjects.length && !objectInfo.id">
       <div class="col-12 list row">
-        <div class="object card col-3 mt-4"  @click="openObject(object)" v-for="object in foundObjects" :key="object.id" >
+        <div class="object card col-3 mt-4" @click="openObject(object)" v-for="object in foundObjects" :key="object.id" >
           <div class="row">
             <div class="col-12">
               <div class="d-block">
@@ -23,6 +22,23 @@
               </div>
               <div class="price">{{ object.full_price }}  ₽ </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="objectInfo.id">
+      <div class="col-12 pointer" @click="objectInfo = {}">
+        <div class="card">
+          <div class="card-body">
+            Вернуться назад
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 pointer" @click="openModal()">
+        <div class="card bg-success">
+          <div class="card-body">
+            Мне это интересно
           </div>
         </div>
       </div>
@@ -65,13 +81,40 @@
             </div>
           </div>
     </div>
+    <iframe  v-if="objectInfo.id" :src="'https://ipoteka.domclick.ru/calc-reg/calculator.html?cost='+objectInfo.full_price+'&prod=4&dk=true&dep=15'" frameborder="0" style="width: 100%;height: 1510px;"></iframe>
     <img class="row col-12 pt-2 demo" src="https://building.letsbot.ru/Frame%203482.png" v-if="objectInfo.id">
+
+    <div class="modal" tabindex="-1" id="sendLead">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Оставить заявку</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <label>Как вас зовут</label>
+            <div class="col-md-12">
+              <input type="text" v-model="name" class="text-input" placeholder="Имя">
+            </div>
+              <label>Контактный телефон</label>
+              <div class="col-md-12">
+                <input type="text" v-model="phone" class="text-input" placeholder="Телефон">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <button type="button" class="btn btn-primary" @click="sendLead">Отправить</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 
+/* eslint-disable */
 export default {
   name: 'BookmarkView',
   data () {
@@ -133,10 +176,15 @@ export default {
           text: 'Адрес',
           key: 'address'
         }
-      ]
+      ],
+      name: null,
+      phone: null
     }
   },
   computed: {
+    uuid () {
+      return this.$store.getters.getUid
+    },
     objects () {
       return this.$store.getters.getObjects
     },
@@ -148,6 +196,21 @@ export default {
     }
   },
   methods: {
+    sendLead () {
+        axios.post('https://building-api.letsbot.ru/api/send-lead', {
+          uuid: this.uuid,
+          name: this.name,
+          phone: this.phone,
+          id: this.objectInfo.id,
+          compl: this.$route.params.hash
+        })
+        this.$root.response = 'Спасибо! Мы получили вашу заявку и скоро с вами свяжемся'
+        $('#sendLead').modal('hide')
+        $('#responseModal').modal('show')
+    },
+    openModal () {
+      $('#sendLead').modal('show')
+    },
     selectCheck (id) {
       if(this.checkbox[id] === undefined) this.checkbox[id] = true
       else this.checkbox[id] = !this.checkbox[id]
@@ -174,7 +237,42 @@ export default {
     }
   },
   mounted() {
-    axios.get('https://building-api.letsbot.ru/api/get-comp?id='+this.$route.params.id).then(response => {
+    console.log(this.uuid)
+    axios.post('https://building-api.letsbot.ru/api/visit?id='+this.$route.params.hash, {
+      uuid: this.uuid,
+      data: {
+        timeOpened:new Date(),
+        timezone:(new Date()).getTimezoneOffset()/60,
+
+        pageon: window.location.pathname,
+        referrer: document.referrer,
+        previousSites: history.length,
+
+        browserName: navigator.appName,
+        browserEngine: navigator.product,
+        browserVersion1a: navigator.appVersion,
+        browserVersion1b: navigator.userAgent,
+        browserLanguage: navigator.language,
+        browserOnline: navigator.onLine,
+        browserPlatform: navigator.platform,
+        javaEnabled: navigator.javaEnabled(),
+        dataCookiesEnabled: navigator.cookieEnabled,
+        dataCookies1: document.cookie,
+        dataCookies2: decodeURIComponent(document.cookie.split(";")),
+        dataStorage: localStorage,
+
+        sizeScreenW: screen.width,
+        sizeScreenH: screen.height,
+        sizeDocW: document.width,
+        sizeDocH: document.height,
+        sizeInW: innerWidth,
+        sizeInH: innerHeight,
+        sizeAvailW: screen.availWidth,
+        sizeAvailH: screen.availHeight,
+        scrColorDepth: screen.colorDepth,
+        scrPixelDepth: screen.pixelDepth,
+      }
+    }).then(response => {
       this.$store.dispatch('SET_OBJECT', response.data)
       this.loadObjects()
     })
@@ -182,7 +280,7 @@ export default {
   watch: {
     $route () {
       this.loadObjects()
-    }
+    },
   }
 }
 </script>
@@ -378,5 +476,12 @@ export default {
       }
     }
   }
+}
+.visit {
+  background: #f2f7f8;
+  position: relative;
+  min-height: 100vh;
+  min-width: 100vw;
+  padding: 20px;
 }
 </style>

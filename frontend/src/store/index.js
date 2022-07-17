@@ -9,13 +9,15 @@ export default new Vuex.Store({
     uuid: new DeviceUUID().get(),
     recent: [],
     object: {},
-    compl: {}
+    compl: [],
+    role: localStorage.getItem('myRole') || 'unknown'
   },
   getters: {
     getUid: state => state.uuid,
     getObject: state => state.object,
     getRecent: state => state.recent,
     getCompl: state => state.compl,
+    getRole: state => state.role,
   },
   mutations: {
     SET_OBJECT: (state, resp) => {
@@ -26,6 +28,11 @@ export default new Vuex.Store({
     },
     SET_COMPL: (state, resp) => {
       Vue.set(state, 'compl', resp)
+    },
+    SET_ROLE: (state, resp) => {
+      Vue.set(state, 'role', resp)
+      localStorage.setItem('myRole', resp)
+      console.log(resp)
     },
     SET_RECENT: (state, resp) => {
       var recent = state.recent
@@ -45,6 +52,9 @@ export default new Vuex.Store({
     },
     SET_COMPL: ({ commit, dispatch, getters }, object) => {
       commit('SET_COMPL', object)
+    },
+    SET_ROLE: ({ commit, dispatch, getters }, string) => {
+      commit('SET_ROLE', string)
     },
     LOAD_RECENT: ({ commit, dispatch, getters }, id) => {
       var json = localStorage.getItem('recent_list')

@@ -4,8 +4,12 @@ import HomeView from '../views/HomeView.vue'
 import RecentView from '../views/RecentView.vue'
 import BoardView from '../views/BoardView.vue'
 import BookmarksView from '../views/BookmarksView.vue'
+import LeadsView from '../views/LeadsView.vue'
 import BookmarkView from '../views/BookmarkView.vue'
 import ObjectView from '../views/ObjectView.vue'
+import AuthView from '../views/AuthView.vue'
+import ObjectsView from '../views/ObjectsView.vue'
+import StatsView from '../views/StatsView.vue'
 import StudentView from '../views/StudentView'
 import StudentView2 from '../views/StudentView2'
 
@@ -43,6 +47,16 @@ const routes = [
     component: BookmarksView
   },
   {
+    path: '/stats',
+    name: 'stats',
+    component: StatsView
+  },
+  {
+    path: '/deals',
+    name: 'deals',
+    component: LeadsView
+  },
+  {
     path: '/selection/:id',
     name: 'Bookmarks',
     component: BookmarkView
@@ -56,6 +70,16 @@ const routes = [
     path: '/object/:id',
     name: 'home',
     component: ObjectView
+  },
+  {
+    path: '/visit/:hash',
+    name: 'visit',
+    component: ObjectsView
+  },
+  {
+    path: '/auth',
+    name: 'auth',
+    component: AuthView
   }
 ]
 

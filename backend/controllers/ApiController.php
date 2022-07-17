@@ -3,7 +3,10 @@
 namespace app\controllers;
 
 use app\models\Compilations;
+use app\models\Deals;
+use app\models\Links;
 use app\models\Objects;
+use app\models\Visited;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -203,5 +206,115 @@ class ApiController extends Controller
             'created_at'=>$object->created_at
         ];
         return $this->asJson($objects);
+    }
+
+    public function actionCreateLink() {
+        $request = json_decode(Yii::$app->request->getRawBody());
+        $link = new Links();
+        $link->uuid=$request->uuid;
+        $link->object_ids = json_encode($request->ids);
+        $link->uniq = md5(implode('_', [$link->uuid, $link->object_ids, time()]));
+        $link->save();
+        return $this->asJson(['hash'=>$link->uniq]);
+    }
+    public function actionVisit($id) {
+        $request = json_decode(Yii::$app->request->getRawBody());
+        $object = Links::findOne(['uniq'=>$id]);
+        $objects = [
+            'id'=>$object->id,
+            'ids'=>json_decode($object->object_ids),
+            'created_at'=>$object->created_at
+        ];
+        $visit=new Visited();
+        $visit->uuid=$request->uuid;
+        $visit->link_id=$object->id;
+        $visit->visit_data=json_encode($request->data);
+        $visit->save();
+        return $this->asJson($objects);
+    }
+    public function actionSendLead() {
+        $request = json_decode(Yii::$app->request->getRawBody());
+        $visit=new Deals();
+        $visit->uuid=$request->uuid;
+        $visit->object_id=$request->id;
+        $visit->name=$request->name;
+        $visit->description=$request->phone;
+        $visit->tags=json_encode(['проявил интерес', 'оставил заявку', 'хакатон']);
+        $visit->save();
+    }
+    public function actionGetLeads($uuid) {
+        $leads = [];
+        $query = Deals::find();
+        $query->andWhere(['IN', 'uuid', $uuid]);
+        $objects=ArrayHelper::map(Objects::find()->all(), 'id', function($data){
+            return $data->getAttributes();
+        });
+        foreach ($query->orderBy('id')->all() as $object) {
+            $leads[$object->id] = $object->getAttributes();
+            $leads[$object->id]['tags']=json_decode($object['tags'], true);
+            $leads[$object->id]['object']=$objects[$object->object_id];
+        }
+        $array = ['found' => count($leads), 'elements' => array_values($leads)];
+        return $this->asJson($array);
+    }
+    public function actionStats() {
+        $report = [];
+        $report['objects'] = Objects::find()->count();
+        $report['agents'] = Links::find()->groupBy(['uuid'])->count();
+        $report['flot']=[];
+        $keys=[];
+        foreach (Visited::find()->all() as $visit) {
+            $time = date('Y-m-d H', strtotime($visit->created_at));
+            $report['visited'][$time][$visit->uuid]=1;
+            $keys[$time]=$time;
+        }
+        foreach (Deals::find()->all() as $visit) {
+            $time = date('Y-m-d H', strtotime($visit->created_at));
+            if(isset($report['leads'][$time])) $report['leads'][$time]=0;
+            $report['leads'][$time]++;
+            $keys[$time]=$time;
+        }
+        foreach (Links::find()->all() as $visit) {
+            $time = date('Y-m-d H', strtotime($visit->created_at));
+            if(isset($report['links'][$time])) $report['links'][$time]=0;
+            $report['links'][$time]++;
+            $keys[$time]=$time;
+        }
+        foreach (Compilations::find()->all() as $visit) {
+            $time = date('Y-m-d H', strtotime($visit->created_at));
+            if(isset($report['compl'][$time])) $report['compl'][$time]=0;
+            $report['compl'][$time]++;
+            $keys[$time]=$time;
+        }
+        $keys=array_keys($keys);
+        sort($keys);
+        foreach ($keys as $index=>$key) {
+            $report['flot']['visited'][$index]=[strtotime($key.':00:00')*1000,0];
+            $report['flot']['leads'][$index]=[strtotime($key.':00:00')*1000,0];
+            $report['flot']['links'][$index]=[strtotime($key.':00:00')*1000,0];
+            $report['flot']['compl'][$index]=[strtotime($key.':00:00')*1000,0];
+        }
+        foreach ($report['leads'] as $k=>$v) {
+            $index = array_search($k, $keys);
+            $report['flot']['leads'][$index][1]++;
+        }
+        foreach ($report['links'] as $k=>$v) {
+            $index = array_search($k, $keys);
+            $report['flot']['links'][$index][1]++;
+        }
+        foreach ($report['compl'] as $k=>$v) {
+            $index = array_search($k, $keys);
+            $report['flot']['compl'][$index][1]++;
+        }
+        foreach ($report['visited'] as $k=>$v) {
+            $index = array_search($k, $keys);
+            $report['flot']['visited'][$index][1]+=count($v);
+        }
+        unset($report['visited']);
+        unset($report['leads']);
+        unset($report['links']);
+        unset($report['compl']);
+//        foreach ($report['visited']);
+        return $this->asJson($report);
     }
 }

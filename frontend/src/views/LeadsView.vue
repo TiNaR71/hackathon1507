@@ -1,15 +1,18 @@
 <template>
   <div class="container-fluid">
-    <div id="bookmarks" v-if="foundObjects.length">
-      <span class="header">Подборки ({{ found }})</span>
+    <div id="deals" v-if="foundObjects.length">
+      <span class="header">Сделки ({{ found }})</span>
       <div class="col-12 row">
-      <div @click="openObject(object)" class="object card col-4 mt-4 pointer" v-for="object in foundObjects" :key="object.id" >
+      <div class="object card col-6 mt-4" v-for="object in foundObjects" :key="object.id" >
         <div class="row">
-          <div class="col-6">{{object.ids.length}} объекта</div>
-          <div class="col-6 text-right">{{ dateFormat(object.created_at) }}</div>
+        <div class="col-3" style="max-width: 70px"><img src="https://building.letsbot.ru/avatar.png" class="demo"></div>
+        <div class="col-9" style="width: calc(100% - 70px)">
+          <div class="row"><div class="col-12"><div :key="tag" v-for="(tag, index) in object.tags" :class="index === 0? 'tag d-inline-block active':'tag d-inline-block'">{{ tag }}</div></div></div>
+          <div class="row">
+            <div class="col-6"><div class="header d-inline-block">{{object.object.humanized_name}}</div><div class="d-inline-block ms-2">{{[object.name, object.description].join(', ')}}</div><h3 style="color: black">{{object.object.full_price}} ₽</h3></div>
+            <div class="col-6 text-right">{{ dateFormat(object.created_at) }}</div>
+          </div>
         </div>
-        <div class="row">
-          <div class="col-12 header">{{object.name}}</div>
         </div>
       </div>
       </div>
@@ -18,7 +21,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            Идет загрузка данных, подождите немного
+            Идет загрузка сделок, подождите немного
           </div>
         </div>
       </div></div>
@@ -26,7 +29,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            Список подборок пока пустой
+            Список сделок пока пустой
           </div>
         </div>
       </div></div>
@@ -39,7 +42,7 @@ import moment from 'moment'
 import 'moment/locale/ru'
 
 export default {
-  name: 'LeadsView',
+  name: 'BookmarksView',
   data () {
     return {
       found: 0,
@@ -63,7 +66,7 @@ export default {
     },
     loadObjects () {
       this.load = true
-        axios.get('https://building-api.letsbot.ru/api/get-compl?uuid='+this.uuid).then(response => {
+        axios.get('https://building-api.letsbot.ru/api/get-leads?uuid='+this.uuid).then(response => {
           this.found = response.data.found
           this.foundObjects = response.data.elements
           this.load = false
@@ -73,6 +76,9 @@ export default {
   },
   mounted() {
     this.loadObjects()
+    setInterval(() => {
+      this.loadObjects()
+    }, 10000)
   },
   watch: {
     $route () {
@@ -85,7 +91,7 @@ export default {
 .text-right {
   text-align: right;
 }
-#bookmarks {
+#deals {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -109,10 +115,29 @@ export default {
     height: auto;
     margin-right: 20px;
     flex: 0 0 auto;
-    width: calc(100%/3 - 20px);
+    width: calc(100%/2 - 20px);
     margin-bottom: 0;
 
 
+    .tag {
+      &.active {
+        background: #E6F9E3;
+      }
+      &:not(.active) {
+        border: 1px solid #163062;
+      }
+      border-radius: 100px;
+      width: auto;
+      display: inline-block;
+      padding: 2px 8px;
+      margin-left: 10px;
+
+      //font-family: 'Calibri';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 15px;
+    }
 
     font-family: 'Open Sans';
     font-style: normal;

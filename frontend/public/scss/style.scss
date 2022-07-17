@@ -183,7 +183,7 @@ header {
     order: 0;
     flex-grow: 0;
 
-    font-family: 'Calibri';
+    //font-family: 'Calibri';
     font-style: normal;
     font-weight: 700;
     font-size: 16px;
@@ -243,5 +243,165 @@ header {
     flex: none;
     order: 1;
     flex-grow: 0;
+  }
+}
+
+#object h4 {
+  display: none;
+}
+#burger {display: none}
+@media (max-width: 700px) {
+  .topbar {
+    height: 40px !important;
+    max-height: 40px !important;
+    .top-navbar {
+      min-height: unset;
+    }
+    .navbar-header {
+      max-height: 40px !important;
+    }
+    #navbarSupportedContent {
+      img {
+        display: none;
+      }
+      display: block;
+      width: 100%;
+      border-top: 0;
+      margin-top: -85px;
+      padding: 0;
+      h4 {
+        display: none;
+      }
+      .select-box {
+        display: none;
+      }
+      .right-box {
+        .buttons {
+          width: auto;
+          height: auto;
+          gap: 5px;
+          .button {
+            height: 30px !important;
+            padding: 0 8px !important;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+    .navbar-brand {
+      width: 70px !important;
+      margin-top: 0!important;
+      .dark-logo {
+        max-width: 66px !important;
+        max-height: 24px !important;
+      }
+    }
+  }
+  .left-sidebar {
+    &:not(.active) {
+      display: none;
+    }
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    width: 80vw;
+    .sidebar-item {
+      width: 100% !important;
+    }
+  }
+  .dropdown-menu {
+    max-height: 150px;
+    overflow-x: scroll;
+  }
+  .page-wrapper, .visit {
+    &:not(.visit) {
+      margin-top: 40px !important;
+      margin-left: 0 !important;
+    }
+    &.visit {
+      padding: 0;
+    }
+    .container-fluid {
+      padding: 10px !important;
+      .select-box_box {
+        overflow-y: auto;
+        min-width: unset !important;
+        width: 100% !important;
+      }
+      .col-3, .col-8 {
+        width: 100% !important;
+      }
+      .col-8.right, .col-4.left {
+        width: 50% !important;
+      }
+      .buttons {
+        display: block !important;
+        width: unset!important;
+        height: unset!important;
+        .button {
+          width: 100% !important;
+          margin-bottom: 10px!important;
+          display: block !important;
+        }
+      }
+      .show-more {
+        display: none!important;
+      }
+      .object.col-4, .col-6 {
+        width: 100% !important;
+      }
+      label.pointer {
+        display: block;
+        width: 100%;
+      }
+    }
+  }
+  #canvas {
+    max-width: 90vw;
+    max-height: 90vw;
+  }
+  #object h4 {
+    display: block;
+  }
+  #burger {
+    display: block;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+  #bookmarks_objects {
+    .col-3 {
+      width: 100% !important;
+      max-width: unset;
+      margin-left: 10px;
+    }
+  }
+  #object {
+    margin-left: 0 !important;
+  }
+  #bookmarks, #objects {
+    .col-12.row {
+      margin: 0;
+    }
+  }
+  .filter {
+    padding: 10px;
+    padding-top: 0;
+    .select-box_box, .selectrow {
+      display: none;
+    }
+    label {
+      height: auto;
+      margin-bottom: 0;
+    }
+    .mb-4 {
+      margin-bottom: 0 !important;
+    }
+    .pt-5 {
+      padding-top: 10px !important;
+    }
+  }
+  .container-fluid > img.demo {
+    max-width: 95vw;
+    margin-left: 0 !important;
   }
 }

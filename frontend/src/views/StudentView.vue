@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <router-link tag="img" to="/train/1" class="pt-2" src="https://building.letsbot.ru/student.png" alt=""></router-link>
+    <router-link tag="img" to="/train/1" class="pt-2 demo" src="https://building.letsbot.ru/student.png" alt=""></router-link>
   </div>
 </template>
 

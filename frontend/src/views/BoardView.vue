@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid" id="board">
-    <img class="pt-2" src="https://building.letsbot.ru/Frame%20471.png" alt="">
+    <img class="pt-2 demo" src="https://building.letsbot.ru/Frame%20471.png" alt="">
   </div>
 </template>
 

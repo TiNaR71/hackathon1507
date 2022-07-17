@@ -1,31 +1,31 @@
 <template>
   <div class="container-fluid">
-    <div id="bookmarks" v-if="foundObjects.length">
+    <div id="bookmarks" v-if="elements.length">
       <span class="header">Подборки ({{ found }})</span>
       <div class="col-12 row">
-      <div @click="openObject(object)" class="object card col-4 mt-4 pointer" v-for="object in foundObjects" :key="object.id" >
-        <div class="row">
-          <div class="col-6">{{object.ids.length}} объекта</div>
-          <div class="col-6 text-right">{{ dateFormat(object.created_at) }}</div>
+        <div @click="openObject(object)" class="object card col-4 mt-4 pointer" v-for="object in elements" :key="object.id" >
+          <div class="row">
+            <div class="col-6">{{object.ids? object.ids.length: 1}} объекта</div>
+            <div class="col-6 text-right">{{ dateFormat(object.created_at) }}</div>
+          </div>
+          <div class="row">
+            <div class="col-12 header">{{object.name}}</div>
+          </div>
         </div>
-        <div class="row">
-          <div class="col-12 header">{{object.name}}</div>
-        </div>
-      </div>
       </div>
     </div>
     <div v-else-if="load" class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            Идет загрузка данных, подождите немного
+            {{found}} Идет загрузка данных, подождите немного
           </div>
         </div>
       </div></div>
     <div v-else class="row">
       <div class="col-12">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body"> {{found}}
             Список подборок пока пустой
           </div>
         </div>
@@ -39,11 +39,11 @@ import moment from 'moment'
 import 'moment/locale/ru'
 
 export default {
-  name: 'LeadsView',
+  name: 'BookmarksView',
   data () {
     return {
       found: 0,
-      foundObjects: [],
+      elements: [],
       checkbox: {},
       load: false
     }
@@ -64,10 +64,15 @@ export default {
     loadObjects () {
       this.load = true
         axios.get('https://building-api.letsbot.ru/api/get-compl?uuid='+this.uuid).then(response => {
+          console.log(response)
+
           this.found = response.data.found
-          this.foundObjects = response.data.elements
-          this.load = false
+          this.elements = response.data.elements
           this.$forceUpdate()
+          setTimeout(()=>{
+            this.load = false
+            this.$forceUpdate()
+          }, 100)
         })
     }
   },

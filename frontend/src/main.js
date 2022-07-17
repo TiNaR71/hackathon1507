@@ -86,7 +86,7 @@ new Vue({
       }).then(async response => {
         this.shareData = {
           title: 'Хакатон Строительство: LetsBot',
-          text: 'Посмотри на эти чудестные объявления :)',
+          text: 'Посмотри на эти чудесные объявления :)',
           url: 'https://building.letsbot.ru/visit/'+response.data.hash
         }
         try {
